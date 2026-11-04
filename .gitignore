@@ -1,0 +1,10 @@
+.venv/
+.cache/
+models/
+cache/
+__pycache__/
+ultron.log*
+ultron.pid
+ultron.out
+tools/
+installer/Output/

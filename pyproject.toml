@@ -1,0 +1,17 @@
+[project]
+name = "ultron"
+version = "0.1.0"
+description = "Open source game clipping: points OBS at your game, runs the replay buffer while you play, and clips by voice"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "openwakeword>=0.6",
+    "faster-whisper>=1.1",
+    "sounddevice>=0.5",
+    "numpy",
+    "obsws-python>=1.7",
+]
+
+[tool.uv]
+package = false
+# Only resolve for Windows; openwakeword's Linux-only dependency has no Python 3.12 build.
+environments = ["sys_platform == 'win32'"]

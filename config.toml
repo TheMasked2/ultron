@@ -1,0 +1,60 @@
+# Ultron settings. Restart Ultron after editing (Start menu: Restart Ultron).
+
+[wake]
+model = "ultron"         # models/wake/ultron.onnx; until it's there, the fallback is used
+fallback = "hey_jarvis"  # built-in openWakeWord model
+threshold = 0.4          # 0-1, raise it if Ultron wakes up by accident
+
+[audio]
+input_device = ""        # part of the mic's name, or "" for the Windows default mic
+tone_volume = 40         # % loudness of Ultron's tones
+silence_rms = 500        # loudness below this counts as silence; raise it in a noisy room
+end_silence_sec = 0.8    # stop listening after this much silence
+max_utterance_sec = 6
+no_speech_timeout_sec = 4
+
+[stt]
+model = "base.en"        # small and fast: it only has to recognise a few phrases
+cpu_threads = 2          # cores the speech model may use; leaves the rest for the game
+
+[obs]
+url = "ws://localhost:4455"
+# The password is read from the OBS_WEBSOCKET_PASSWORD environment variable
+# (the installer's "Set up OBS" step saves it).
+
+[voice]
+game_only = ["clip", "start_recording"]  # refused when no game runs; stop/pause/resume always work
+
+# What you can say. Add, change or remove phrases; remove a line to turn it off.
+# A phrase counts when your sentence ends with it: "oh my god clip that" clips.
+# "Hey" and "Ultron" before a command are ignored.
+[phrases]
+clip = ["clip that", "clip it", "clip this", "clip", "save that", "save it"]
+start_recording = ["start recording", "start the recording"]
+stop_recording = ["stop recording", "stop the recording"]
+pause_recording = ["pause recording", "pause the recording"]
+resume_recording = ["unpause recording", "resume recording", "continue recording", "unpause the recording", "resume the recording"]
+
+[watcher]
+poll_seconds = 3
+game_capture_source = "Game Capture"   # sources pointed at the game ("" to skip one)
+game_window_source = "Game Window"
+game_audio_source = "Game Audio"
+replay_buffer = true                   # run the replay buffer only while a game runs
+
+[watcher.switch_scenes]
+enabled = false
+game_scene = "Game"      # switched to when a game starts
+idle_scene = ""          # and to this when it closes
+
+[games]
+# Programs that are on Discord's game list but aren't games.
+ignore = [
+    "riot client.exe", "riotclientservices.exe", "steam.exe", "steamwebhelper.exe",
+    "epicgameslauncher.exe", "battle.net.exe", "eadesktop.exe", "galaxyclient.exe",
+    "ubisoftconnect.exe", "discord.exe", "spotify.exe", "obs64.exe", "sh.exe",
+    "bash.exe", "gh.exe", "git.exe", "explorer.exe",
+]
+# Games Discord doesn't know (e.g. one you're making), one line each:
+# extra = [{ name = "My Game", exe = "mygame.exe" }]
+extra = []
