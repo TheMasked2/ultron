@@ -153,7 +153,7 @@ If PowerShell says a script "is not digitally signed", run it as
 
 ## Works well with
 
-- [Jarvis](https://github.com/TheMasked2/jarvis): a voice assistant for the rest of
+- Jarvis: a voice assistant for the rest of
   your PC (music, volume, apps, questions).
 
 ## License
