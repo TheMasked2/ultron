@@ -62,7 +62,7 @@ class VoiceIO(TextIO):
         self.np, self.sd = np, sd
         self.audio, self.stt_cfg = cfg["audio"], cfg["stt"]
         self.threshold = cfg["wake"]["threshold"]
-        self.volume = max(0, min(100, int(self.audio.get("tone_volume", 40)))) / 100
+        self.volume = max(0, min(100, int(self.audio.get("tone_volume", 15)))) / 100
         self.wake = Model(wakeword_models=[wake_model(cfg)], inference_framework="onnx")
         self.stt = WhisperModel(self.stt_cfg["model"], device="cpu", compute_type="int8",
                                 cpu_threads=self.stt_cfg["cpu_threads"])

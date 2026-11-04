@@ -7,7 +7,7 @@ threshold = 0.7          # 0-1, raise it if Ultron wakes up by accident
 
 [audio]
 input_device = ""        # part of the mic's name, or "" for the Windows default mic
-tone_volume = 40         # % loudness of Ultron's tones
+tone_volume = 15         # % loudness of Ultron's tones (0-100)
 silence_rms = 500        # loudness below this counts as silence; raise it in a noisy room
 end_silence_sec = 0.8    # stop listening after this much silence
 max_utterance_sec = 6
