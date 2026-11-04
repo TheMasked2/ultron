@@ -9,6 +9,7 @@ $v = "1.0.$(git -C $repo rev-list --count HEAD)"
 git -C $repo push
 Push-Location $repo
 try {
-    gh release create "v$v" "$PSScriptRoot\Output\UltronSetup.exe" --title "Ultron $v" --notes "Download **UltronSetup.exe** below and run it. Windows may say 'Windows protected your PC' because the installer isn't signed: click **More info > Run anyway**."
+    gh release create "v$v" "$PSScriptRoot\Output\UltronSetup.exe" --title "Ultron $v" --notes-file "$PSScriptRoot\release-notes.md"
+elease-notes.md"
     if ($LASTEXITCODE) { throw "gh release failed ($LASTEXITCODE)" }
 } finally { Pop-Location }

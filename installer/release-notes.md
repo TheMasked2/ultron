@@ -1,0 +1,17 @@
+## Install
+
+1. Install [OBS Studio](https://obsproject.com) 28 or newer and open it once.
+2. Download **UltronSetup.exe** below and run it. The installer isn't code-signed, so Windows may say "Windows protected your PC": click **More info → Run anyway**.
+3. Leave **Set up OBS for me** on, choose your clip length, scene and audio tracks.
+4. Start a game and say **"Ultron, clip that"**.
+
+## What's in it
+
+- Automatic game detection (Discord's list of detectable games) that points OBS's Game Capture, Game Window and Game Audio at the running game
+- Replay buffer only while a game is running
+- Voice commands: clip that, start / stop / pause / unpause recording
+- Local "Ultron" wake word (97.7% recall on unseen voices, about one false wake per 2.7 hours)
+- OBS setup wizard: new or existing scene, audio track presets from one mix up to one track per app
+- Offers to remove OBS Game Watcher, which Ultron replaces
+
+Everything runs locally. No account, no upload.

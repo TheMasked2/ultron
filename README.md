@@ -1,88 +1,128 @@
 # Ultron
 
-Open source game clipping for Windows, built on OBS. While you play, Ultron points
-OBS at your game and keeps the last minutes in OBS's replay buffer. Say
-**"Ultron, clip that"** (or press OBS's Save Replay hotkey) to save them.
+**Open source game clipping for Windows, built on OBS.**
 
-Everything runs locally: game detection, the wake word and speech recognition.
-No account, no upload, no AI service.
+![Windows 10/11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB)
+![OBS Studio 28+](https://img.shields.io/badge/OBS%20Studio-28%2B-302E31)
+![License: MIT](https://img.shields.io/badge/License-MIT-green)
+
+While you play, Ultron points OBS at your game and keeps the last minutes in OBS's
+replay buffer. Say **"Ultron, clip that"** and the moment is saved.
+
+- **Automatic game capture.** Recognises thousands of games, and points OBS's capture and audio at whichever one is running.
+- **Replay buffer only while you play.** Every clip has game footage, and nothing records while you're not gaming.
+- **Clip by voice.** You never take your hands off the game. Recording works by voice too.
+- **One-click OBS setup.** Scene, sources, clip length and audio tracks (one mix, or a separate track per app for editing).
+- **Local and private.** Game detection, the wake word and speech recognition all run on your PC. No account, no upload, no cloud service.
+- **Light on the game.** Below-normal priority, a small speech model, no voice output.
+
+## Contents
+
+- [Install](#install)
+- [Voice commands](#voice-commands)
+- [How it works](#how-it-works)
+- [Configuration](#configuration)
+- [Development](#development)
+- [License](#license)
 
 ## Install
 
-1. Install [OBS Studio](https://obsproject.com) and open it once.
-2. Download **[UltronSetup.exe](https://github.com/TheMasked2/ultron/releases/latest/download/UltronSetup.exe)**
+**You need:** Windows 10 or 11, [OBS Studio](https://obsproject.com) 28 or newer
+(opened at least once) and a microphone.
+
+1. Download **[UltronSetup.exe](https://github.com/TheMasked2/ultron/releases/latest/download/UltronSetup.exe)**
    (or pick a version under [Releases](https://github.com/TheMasked2/ultron/releases)) and run it.
-   Windows may say "Windows protected your PC" because the installer isn't signed:
+   The installer isn't code-signed, so Windows may say "Windows protected your PC":
    click **More info → Run anyway**.
-3. Click through the wizard. Leave **Set up OBS for me** on. It:
+2. Click through the wizard. Leave **Set up OBS for me** on. It:
    - turns on OBS's WebSocket server and replay buffer (anything already set up is kept)
    - asks for the **clip length**
-   - asks for the **scene**: a new one (default "Game") or one you have
-   - asks for the **audio tracks**: one mixed track; separate tracks for editing
-     (1 everything, 2 mic, 3 game, optionally 4 Discord and 5 music); each app
-     separate (1 everything, 2 mic, 3 game, 4 Discord, 5 music, 6 browser, with
-     Desktop Audio muted, so other programs aren't heard); a custom count; or keep
-     your settings. Track 1 is always the full mix, so clips sound right anywhere.
+   - asks for the **scene**: a new one (default "Game") or one you already have
+   - asks for the **audio tracks** (see below)
    - adds the Game Capture, Game Window and Game Audio sources
 
-   If OBS is open it asks to close it for a moment. The last page lists the OBS
-   choices before anything is installed.
-4. Setup downloads Python and the speech models (a few hundred MB).
-5. Start a game and say "Ultron, clip that".
+   If OBS is open it asks to close it for a moment. The last page lists every OBS
+   change before anything is installed.
+3. Setup downloads Python and the speech model (a few hundred MB, a few minutes).
+4. Start a game and say **"Ultron, clip that"**.
 
-The Start menu has the settings (`config.toml`), the log, "Restart Ultron" (after
-editing the settings), "Repair" (download the models again) and "Set up OBS again".
+| Audio track preset | Tracks |
+|---|---|
+| Simple | 1 mixed track |
+| Editing | 1 everything, 2 mic, 3 game; optionally 4 Discord and 5 music |
+| Every app separate | 1 everything, 2 mic, 3 game, 4 Discord, 5 music, 6 browser. Desktop Audio is muted, so other programs aren't heard |
+| Custom / Keep | Your own track count, or leave OBS as it is |
+
+Track 1 is always the full mix, so clips sound right in any player.
+
+The Start menu has the settings (`config.toml`), the log, **Restart Ultron** (after
+editing the settings), **Repair** (download the models again) and **Set up OBS again**.
 Uninstall from Settings → Apps; your `config.toml` is kept.
 
-If OBS Game Watcher is installed, the installer offers to remove it: Ultron does
-the same job, and both would steer OBS at once.
-
-## How it works
-
-1. Every 3 seconds it lists running programs (straight from Windows, about 1 ms)
-   and matches them against [Discord's public list of detectable games](https://discord.com/api/v9/applications/detectable)
-   (cached, refreshed daily). No Discord login is involved.
-2. When a game runs, it points these OBS sources at the game's window, and
-   corrects them if they drift (changed by hand, game relaunched):
-   - **Game Capture**
-   - **Game Window** (Window Capture, underneath): shows games Game Capture can't hook,
-     e.g. Clickteam games like Five Nights at Freddy's
-   - **Game Audio** (Application Audio Capture): game sound on its own track
-3. It runs the replay buffer only while a game is running, so a clip always has
-   game footage.
-4. Optionally it switches scenes when a game starts and stops.
-
-Anti-cheat protected games (e.g. VALORANT) hide their file path; those are matched
-on the executable name alone. A game Discord doesn't know (one you're making, say)
-goes under `extra` in `[games]`.
+Upgrading from OBS Game Watcher? The installer offers to remove it, since Ultron does
+the same job and both would steer OBS at once.
 
 ## Voice commands
 
+Say the wake word **"Ultron"**, then the command, in one breath or after the tone.
+
 | Say | Does |
 |---|---|
-| clip that / clip it / save that | Saves the replay buffer (only while a game runs) |
-| start / stop recording | OBS recording (starting only while a game runs) |
-| pause / unpause recording | Pauses and resumes a recording |
+| clip that / clip it / save that | Saves the replay buffer (while a game runs) |
+| start recording / stop recording | OBS recording (starting only while a game runs) |
+| pause recording / unpause recording | Pauses and resumes a recording |
 
-Say the wake word first: **"Ultron"**. A rising tone means done, a falling tone
-means it couldn't (no game running, OBS closed, ...). The log says why. Anything
-else you say is ignored: Ultron only does OBS.
+A rising tone means done, a falling tone means it couldn't (no game running, OBS
+closed, ...). `ultron.log` says why. Anything else is ignored: Ultron only controls
+OBS. OBS's own Save Replay hotkey keeps working too.
 
 The phrases are yours to change under `[phrases]` in `config.toml`.
 
-**Wake word:** "Ultron" (`models\wake\ultron.onnx`, trained with openWakeWord on
-synthetic voices: 97.7% recall on unseen voices, about one false wake per 2.7 hours
-of other audio). If it wakes by accident, raise `threshold` under `[wake]`; if it
-misses you, lower it. Without the model file Ultron falls back to **"Hey Jarvis"**.
+**Wake word accuracy.** The "Ultron" model (`models\wake\ultron.onnx`) was trained
+with [openWakeWord](https://github.com/dscripka/openWakeWord) on synthetic voices.
+On voices it never heard in training it catches 97.7% of wake words, with about one
+false wake per 2.7 hours of other audio. If it wakes by accident, raise `threshold`
+under `[wake]`; if it misses you, lower it.
 
-## Light on the game
+## How it works
 
-- Below-normal process priority: the game always wins the CPU.
-- Speech recognition uses Whisper `base.en` on 2 CPU threads, only after the wake word.
-- No speech output: tones only, no voice model.
-- One process: game detection, OBS control and voice share it.
+1. Every 3 seconds Ultron lists the running programs (straight from Windows, about
+   1 ms) and matches them against [Discord's public list of detectable games](https://discord.com/api/v9/applications/detectable),
+   cached and refreshed daily. No Discord login is involved.
+2. When a game runs, it points these OBS sources at the game's window, and corrects
+   them if they drift (changed by hand, game relaunched):
+   - **Game Capture**
+   - **Game Window** (Window Capture, underneath): shows games Game Capture can't
+     hook, such as Clickteam games like Five Nights at Freddy's
+   - **Game Audio** (Application Audio Capture): the game's sound on its own track
+3. It runs the replay buffer only while a game is running.
+4. Optionally it switches scenes when a game starts and stops.
 
-## Manual setup and running
+Anti-cheat protected games (VALORANT, for example) hide their file path; those are
+matched on the executable name alone. A game Discord doesn't know (one you're making,
+say) goes under `extra` in `[games]`.
+
+**Performance.** Ultron runs at below-normal priority, so the game always wins the
+CPU. Speech recognition (Whisper `base.en`, 2 CPU threads) runs only after the wake
+word. Game detection, OBS control and voice share one process.
+
+## Configuration
+
+Settings live in `config.toml` in the install folder. Restart Ultron after editing.
+
+| Section | What |
+|---|---|
+| `[wake]` | Wake word model, fallback and sensitivity |
+| `[audio]` | Microphone, tone loudness, when listening stops |
+| `[stt]` | Speech model and CPU threads |
+| `[obs]` | OBS WebSocket address (password: the `OBS_WEBSOCKET_PASSWORD` user environment variable) |
+| `[voice]` | Commands that only work while a game runs |
+| `[phrases]` | What you can say |
+| `[watcher]` | Source names, poll interval, replay buffer, scene switching |
+| `[games]` | Programs that aren't games (`ignore`), games Discord doesn't know (`extra`) |
+
+## Development
 
 ```powershell
 .\setup.ps1                          # once: uv, Python 3.12, packages, models (kept in this folder)
@@ -96,24 +136,10 @@ misses you, lower it. Without the model file Ultron falls back to **"Hey Jarvis"
 If PowerShell says a script "is not digitally signed", run it as
 `powershell -ExecutionPolicy Bypass -File .\setup.ps1`.
 
-To build the installer: `.\installer\build.ps1` (needs [Inno Setup 6](https://jrsoftware.org));
-`-UiTest` builds one that shows every page but never installs. To publish it as a
-GitHub release (what the download link points at): `.\installer\release.ps1`.
-
-## Configuration (`config.toml`)
-
-| Section | What |
-|---|---|
-| `[wake]` | Wake word model, fallback and sensitivity |
-| `[audio]` | Mic, tone loudness, when listening stops |
-| `[stt]` | Speech model and CPU threads |
-| `[obs]` | OBS WebSocket address (password: `OBS_WEBSOCKET_PASSWORD` user environment variable) |
-| `[voice]` | Commands that only work while a game runs |
-| `[phrases]` | What you can say |
-| `[watcher]` | Source names, poll interval, replay buffer, scene switching |
-| `[games]` | Programs that aren't games (`ignore`), games Discord doesn't know (`extra`) |
-
-## Files
+- **Installer:** `.\installer\build.ps1` (needs [Inno Setup 6](https://jrsoftware.org)).
+  `-UiTest` builds one that shows every page but never installs.
+- **Release:** `.\installer\release.ps1` builds it and publishes a GitHub release,
+  which is what the download link points at.
 
 | File | What it does |
 |---|---|
@@ -123,10 +149,16 @@ GitHub release (what the download link points at): `.\installer\release.ps1`.
 | `ultron/obs.py` | The shared OBS WebSocket connection |
 | `ultron/voice.py` | Wake word, speech recognition, tones |
 | `ultron/commands.py` | The voice commands |
-| `ultron.log` | What was detected, heard and done |
-| `installer/` | The Setup.exe (Inno Setup), `obs-setup.ps1` and the OBS wizard pages |
+| `installer/` | Setup.exe (Inno Setup), `obs-setup.ps1` and the OBS wizard pages |
 
 ## Works well with
 
-- [Jarvis](https://github.com/TheMasked2/jarvis): a voice assistant for the rest
-  of your PC (music, volume, apps, questions).
+- [Jarvis](https://github.com/TheMasked2/jarvis): a voice assistant for the rest of
+  your PC (music, volume, apps, questions).
+
+## License
+
+[MIT](LICENSE). Built on [OBS Studio](https://obsproject.com),
+[openWakeWord](https://github.com/dscripka/openWakeWord),
+[faster-whisper](https://github.com/SYSTRAN/faster-whisper) and
+[obsws-python](https://github.com/aatikturk/obsws-python).
