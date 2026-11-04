@@ -43,6 +43,7 @@ Source: "..\run.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\start-hidden.vbs"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\restart.ps1"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\models\wake\ultron.onnx"; DestDir: "{app}\models\wake"; Flags: ignoreversion
 ; Keep the user's settings on upgrade.
 Source: "..\config.toml"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsneveruninstall
 Source: "obs-setup.ps1"; DestDir: "{app}"; Flags: ignoreversion

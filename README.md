@@ -70,9 +70,10 @@ else you say is ignored: Ultron only does OBS.
 
 The phrases are yours to change under `[phrases]` in `config.toml`.
 
-**Wake word:** the "Ultron" model is still being trained. Until
-`models\wake\ultron.onnx` exists, Ultron answers to **"Hey Jarvis"** (`fallback`
-under `[wake]`).
+**Wake word:** "Ultron" (`models\wake\ultron.onnx`, trained with openWakeWord on
+synthetic voices: 97.7% recall on unseen voices, about one false wake per 2.7 hours
+of other audio). If it wakes by accident, raise `threshold` under `[wake]`; if it
+misses you, lower it. Without the model file Ultron falls back to **"Hey Jarvis"**.
 
 ## Light on the game
 

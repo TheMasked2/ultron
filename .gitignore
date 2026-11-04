@@ -1,6 +1,9 @@
 .venv/
 .cache/
-models/
+models/*
+!models/wake/
+models/wake/*
+!models/wake/ultron.onnx
 cache/
 __pycache__/
 ultron.log*
