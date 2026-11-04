@@ -3,7 +3,7 @@
 [wake]
 model = "ultron"         # models/wake/ultron.onnx; until it's there, the fallback is used
 fallback = "hey_jarvis"  # built-in openWakeWord model
-threshold = 0.4          # 0-1, raise it if Ultron wakes up by accident
+threshold = 0.7          # 0-1, raise it if Ultron wakes up by accident
 
 [audio]
 input_device = ""        # part of the mic's name, or "" for the Windows default mic
