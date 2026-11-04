@@ -142,6 +142,7 @@ procedure OnLog(const S: String; const Error, FirstLine: Boolean);
 begin
   if Trim(S) <> '' then
   begin
+    SaveStringToFile(ExpandConstant('{app}\install.log'), S + #13#10, True);
     LogLines.Add(S);
     if LogLines.Count > 15 then LogLines.Delete(0);
     Progress.SetText(Progress.Msg1Label.Caption, S);
@@ -160,6 +161,7 @@ end;
 function RunScript(Title, Script, Params: String): Integer;
 begin
   LogLines.Clear;
+  SaveStringToFile(ExpandConstant('{app}\install.log'), GetDateTimeString('yyyy-mm-dd hh:nn:ss', '-', ':') + ' ' + Script + ' ' + Params + #13#10, True);
   Progress.SetText(Title, '');
   Progress.Show;
   try

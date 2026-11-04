@@ -29,7 +29,7 @@ game_only = ["clip", "start_recording"]  # refused when no game runs; stop/pause
 # A phrase counts when your sentence ends with it: "oh my god clip that" clips.
 # "Hey" and "Ultron" before a command are ignored.
 [phrases]
-clip = ["clip that", "clip it", "clip this", "clip", "save that", "save it"]
+clip = ["clip that", "clip it", "clip this", "clip", "save that", "save it", "click that", "click it"]
 start_recording = ["start recording", "start the recording"]
 stop_recording = ["stop recording", "stop the recording"]
 pause_recording = ["pause recording", "pause the recording"]

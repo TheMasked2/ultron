@@ -16,6 +16,36 @@ class ObsRequestError(ObsError):
     """OBS answered, but refused the request (missing source, replay buffer disabled, ...)."""
 
 
+def password() -> str:
+    """The installer saves the password for the Windows user. Read it from there each time:
+    a process started before it was saved (or holding an old one) would send the wrong one."""
+    try:
+        import winreg
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as k:
+            saved = winreg.QueryValueEx(k, "OBS_WEBSOCKET_PASSWORD")[0]
+        if saved:
+            return saved
+    except OSError:
+        pass
+    return os.environ.get("OBS_WEBSOCKET_PASSWORD", "")
+
+
+FIX = 'run "Set up OBS again" from the Start menu'
+
+
+def explain(e: Exception, port: int) -> str:
+    """Turn a failed connect into something a friend can act on."""
+    from obsws_python.error import OBSSDKError
+    if isinstance(e, OBSSDKError):
+        if "no password" in str(e):
+            return f"OBS wants a WebSocket password, but none is saved: {FIX}"
+        if "identify" in str(e):
+            return f"OBS refused the WebSocket password: {FIX}"
+    if isinstance(e, (ConnectionError, TimeoutError)) or "timed out" in str(e).lower():
+        return f"OBS isn't open, or its WebSocket server is off (port {port})"
+    return f"OBS not reachable ({type(e).__name__}: {e})"
+
+
 class Obs:
     def __init__(self, url: str):
         u = urlparse(url)
@@ -30,7 +60,7 @@ class Obs:
     def _connect(self):
         import obsws_python as obsws
         self._client = obsws.ReqClient(host=self.host, port=self.port, timeout=5,
-                                       password=os.environ.get("OBS_WEBSOCKET_PASSWORD", ""))
+                                       password=password())
         log.info("Connected to OBS")
 
     def _drop(self):
@@ -56,4 +86,4 @@ class Obs:
                 except Exception as e:
                     self._drop()
                     if not retry:
-                        raise ObsError(f"OBS not reachable ({type(e).__name__})") from None
+                        raise ObsError(explain(e, self.port)) from None

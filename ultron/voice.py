@@ -62,6 +62,9 @@ class VoiceIO(TextIO):
         self.np, self.sd = np, sd
         self.audio, self.stt_cfg = cfg["audio"], cfg["stt"]
         self.threshold = cfg["wake"]["threshold"]
+        # Whisper hears the commands better when it knows them ("click that" -> "clip that").
+        said = [p[0] for p in cfg.get("phrases", {}).values() if p]
+        self.hint = ". ".join(s.capitalize() for s in said) + "." if said else None
         self.volume = max(0, min(100, int(self.audio.get("tone_volume", 15)))) / 100
         self.wake = Model(wakeword_models=[wake_model(cfg)], inference_framework="onnx")
         self.stt = WhisperModel(self.stt_cfg["model"], device="cpu", compute_type="int8",
@@ -115,5 +118,6 @@ class VoiceIO(TextIO):
                 if elapsed >= self.audio["no_speech_timeout_sec"]:
                     return ""
         audio = np.concatenate(frames).astype(np.float32) / 32768
-        segments, _ = self.stt.transcribe(audio, language="en", beam_size=1, vad_filter=True)
+        segments, _ = self.stt.transcribe(audio, language="en", beam_size=1, vad_filter=True,
+                                         initial_prompt=self.hint)
         return " ".join(s.text.strip() for s in segments).strip()

@@ -1,3 +1,10 @@
+## New in 1.0.8
+
+- Fixed: Ultron could fail to connect when OBS had a different WebSocket password than the one Ultron had picked up. It now reads the saved password every time it connects.
+- The log now says what's wrong: OBS not open, password refused, or no password saved (fix the last two with **Set up OBS again** in the Start menu)
+- Better speech recognition for the commands; "click that" now clips too
+- The installer saves its setup output to `install.log` in the Ultron folder
+
 ## Install
 
 1. Install [OBS Studio](https://obsproject.com) 28 or newer and open it once.
