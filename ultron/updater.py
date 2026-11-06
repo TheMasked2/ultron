@@ -76,7 +76,18 @@ def members(z: zipfile.ZipFile) -> list[str]:
 def uv_env() -> dict:
     """The same folders env.ps1 sets, so uv works on this install's Python and cache."""
     return os.environ | {"UV_PYTHON_INSTALL_DIR": str(ROOT / ".cache" / "python"), "UV_CACHE_DIR": str(ROOT / ".cache" / "uv"),
-                         "UV_LINK_MODE": "copy", "HF_HOME": str(ROOT / "models"), "UV_NO_PROGRESS": "1"}
+                         "UV_LINK_MODE": "copy", "HF_HOME": str(ROOT / "models"), "UV_NO_PROGRESS": "1",
+                         "UV_PYTHON_PREFERENCE": "only-managed"}
+
+
+def own_python() -> bool:
+    """False for installs whose venv sits on another program's Python (older setups allowed that)."""
+    try:
+        cfg = (ROOT / ".venv" / "pyvenv.cfg").read_text(encoding="utf-8")
+    except OSError:
+        return True
+    home = next((l.split("=", 1)[1].strip() for l in cfg.splitlines() if l.split("=", 1)[0].strip() == "home"), "")
+    return not home or home.lower().startswith(str(ROOT / ".cache" / "python").lower())
 
 
 class Updater(threading.Thread):
@@ -198,11 +209,15 @@ class Updater(threading.Thread):
 
     def restart(self, sync: bool):
         """A helper waits for this process to end (the venv's files are locked while it
-        runs), syncs packages if uv.lock changed, then starts Ultron again."""
+        runs), syncs packages if uv.lock changed, then starts Ultron again. An install on
+        another program's Python runs the whole setup instead, which moves it to its own."""
         uv = ROOT / "tools" / "uv.exe"
-        steps = [f"ping -n 4 127.0.0.1 >nul"]
-        if sync and uv.exists():
-            steps.append(f'"{uv}" sync --project "{ROOT}" --python 3.12 >> "{ROOT / "ultron.out"}" 2>&1')
+        out = ROOT / "ultron.out"
+        steps = ["ping -n 4 127.0.0.1 >nul"]
+        if not own_python():
+            steps.append(f'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "{ROOT / "setup.ps1"}" >> "{out}" 2>&1')
+        elif sync and uv.exists():
+            steps.append(f'"{uv}" sync --project "{ROOT}" --python 3.12 >> "{out}" 2>&1')
         steps.append(f'wscript.exe "{ROOT / "start-hidden.vbs"}"')
         (ROOT / "ultron.pid").unlink(missing_ok=True)
         subprocess.Popen(f'cmd.exe /d /c "{" & ".join(steps)}"', env=uv_env(), cwd=str(ROOT),

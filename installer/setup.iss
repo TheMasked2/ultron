@@ -1,4 +1,4 @@
-; Ultron installer (Inno Setup 6.3+). Build with installer\build.ps1.
+﻿; Ultron installer (Inno Setup 6.3+). Build with installer\build.ps1.
 
 #define AppName "Ultron"
 #ifndef AppVersion
@@ -68,6 +68,7 @@ Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "{code:Stop
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\.venv"
+Type: filesandordirs; Name: "{app}\.venv-old"
 Type: filesandordirs; Name: "{app}\.cache"
 Type: filesandordirs; Name: "{app}\models"
 Type: filesandordirs; Name: "{app}\cache"
