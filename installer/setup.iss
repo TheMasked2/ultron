@@ -30,7 +30,7 @@ FinishedLabel=Ultron is installed. Start a game, then say "Ultron, clip that" wh
 
 [Tasks]
 Name: startup; Description: "Start with Windows (recommended)"
-Name: autoupdate; Description: "Keep Ultron up to date (installs new versions from GitHub by itself, never during a game)"
+Name: autoupdate; Description: "Keep Ultron up to date (updates from GitHub by itself, never during a game)"
 Name: obs; Description: "Set up OBS for me (WebSocket, replay buffer, scene, sources and audio tracks)"
 
 [Files]
@@ -62,8 +62,6 @@ Name: "{userprograms}\{#AppName}\Uninstall {#AppName}"; Filename: "{uninstallexe
 
 [Run]
 Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-hidden.vbs"""; Description: "Start Ultron now"; Flags: postinstall nowait skipifsilent
-; After an automatic update (silent, /UPDATE=1) Ultron starts again by itself.
-Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-hidden.vbs"""; Flags: nowait; Check: IsUpdate
 
 [UninstallRun]
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "{code:StopCommand}"; Flags: runhidden; RunOnceId: "StopUltron"
@@ -79,6 +77,8 @@ Type: files; Name: "{app}\ultron.out"
 Type: files; Name: "{app}\ultron.pid"
 Type: files; Name: "{app}\version.txt"
 Type: files; Name: "{app}\install.log"
+; Files an update added that this installer doesn't know about.
+Type: filesandordirs; Name: "{app}\ultron"
 
 [Code]
 #include "obs-pages.iss"
@@ -87,12 +87,6 @@ var
   ReplayPage: TInputQueryWizardPage;
   Progress: TOutputMarqueeProgressWizardPage;
   LogLines: TStringList;
-
-{ Started by Ultron's updater: no questions, no OBS changes, Ultron restarts afterwards. }
-function IsUpdate: Boolean;
-begin
-  Result := ExpandConstant('{param:update|0}') = '1';
-end;
 
 { config.toml [update] auto = true/false, from the "Keep Ultron up to date" task. }
 procedure SetAutoUpdate(On: Boolean);
@@ -105,7 +99,7 @@ begin
   Path := ExpandConstant('{app}\config.toml');
   if not LoadStringsFromFile(Path, Lines) then Exit;
   if On then Value := 'true ' else Value := 'false';
-  Comment := '             # install new releases from GitHub by itself (only when no game runs and OBS isn''t recording)';
+  Comment := '             # update from GitHub releases by itself (only when no game runs and OBS isn''t recording)';
   Found := False;
   N := GetArrayLength(Lines);
   for I := 0 to N - 1 do
@@ -278,7 +272,7 @@ begin
   if CurStep <> ssPostInstall then Exit;
   SaveStringToFile(ExpandConstant('{app}\version.txt'), '{#AppVersion}', False);
   SetAutoUpdate(WizardIsTaskSelected('autoupdate'));
-  if not IsUpdate then OfferWatcherRemoval;
+  OfferWatcherRemoval;
   SetUpUltron;
-  if WizardIsTaskSelected('obs') and not IsUpdate then SetUpObs;
+  if WizardIsTaskSelected('obs') then SetUpObs;
 end;

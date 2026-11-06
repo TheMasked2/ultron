@@ -23,7 +23,7 @@ url = "ws://localhost:4455"
 # (the installer's "Set up OBS" step saves it).
 
 [update]
-auto = true              # install new releases from GitHub by itself (only when no game runs and OBS isn't recording)
+auto = true              # update from GitHub releases by itself (only when no game runs and OBS isn't recording)
 check_hours = 6          # how often to look for a new release; with auto = false it's only written to the log
 
 [voice]

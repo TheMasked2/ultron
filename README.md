@@ -57,8 +57,8 @@ replay buffer. Say **"Ultron, clip that"** and the moment is saved.
 Track 1 is always the full mix, so clips sound right in any player.
 
 **Updates.** With **Keep Ultron up to date** on (the default), Ultron checks this
-repo's releases every 6 hours and installs a new one by itself, but only while no
-game runs and OBS isn't recording. Then it restarts. Turn it off with `auto = false`
+repo's releases every 6 hours and updates itself, but only while no game runs and
+OBS isn't recording. Then it restarts. Your `config.toml` is never replaced. Turn it off with `auto = false`
 under `[update]`, and new versions are only mentioned in the log.
 
 The Start menu has the settings (`config.toml`), the log, **Restart Ultron** (after
