@@ -26,10 +26,11 @@ CloseApplications=no
 
 [Messages]
 WelcomeLabel2=This installs [name/ver], open source game clipping with OBS.%n%nWhile you play, Ultron points OBS at your game and keeps the last minutes ready. Say "Ultron, clip that" (or use OBS's Save Replay hotkey) to save them. You can also start, stop and pause recording by voice.%n%nYou need OBS Studio (obsproject.com), a microphone and an internet connection: setup downloads Python and the speech models (a few hundred MB). Everything stays in the folder you pick next.
-FinishedLabel=Ultron is installed. Start a game, then say "Ultron, clip that" whenever something happens.%n%nUntil the Ultron wake word ships, Ultron answers to "Hey Jarvis".
+FinishedLabel=Ultron is installed. Start a game, then say "Ultron, clip that" whenever something happens.
 
 [Tasks]
 Name: startup; Description: "Start with Windows (recommended)"
+Name: autoupdate; Description: "Keep Ultron up to date (installs new versions from GitHub by itself, never during a game)"
 Name: obs; Description: "Set up OBS for me (WebSocket, replay buffer, scene, sources and audio tracks)"
 
 [Files]
@@ -61,6 +62,8 @@ Name: "{userprograms}\{#AppName}\Uninstall {#AppName}"; Filename: "{uninstallexe
 
 [Run]
 Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-hidden.vbs"""; Description: "Start Ultron now"; Flags: postinstall nowait skipifsilent
+; After an automatic update (silent, /UPDATE=1) Ultron starts again by itself.
+Filename: "{sys}\wscript.exe"; Parameters: """{app}\start-hidden.vbs"""; Flags: nowait; Check: IsUpdate
 
 [UninstallRun]
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "{code:StopCommand}"; Flags: runhidden; RunOnceId: "StopUltron"
@@ -74,6 +77,8 @@ Type: filesandordirs; Name: "{app}\ultron\__pycache__"
 Type: files; Name: "{app}\ultron.log*"
 Type: files; Name: "{app}\ultron.out"
 Type: files; Name: "{app}\ultron.pid"
+Type: files; Name: "{app}\version.txt"
+Type: files; Name: "{app}\install.log"
 
 [Code]
 #include "obs-pages.iss"
@@ -82,6 +87,43 @@ var
   ReplayPage: TInputQueryWizardPage;
   Progress: TOutputMarqueeProgressWizardPage;
   LogLines: TStringList;
+
+{ Started by Ultron's updater: no questions, no OBS changes, Ultron restarts afterwards. }
+function IsUpdate: Boolean;
+begin
+  Result := ExpandConstant('{param:update|0}') = '1';
+end;
+
+{ config.toml [update] auto = true/false, from the "Keep Ultron up to date" task. }
+procedure SetAutoUpdate(On: Boolean);
+var
+  Path, Value, Comment: String;
+  Lines: TArrayOfString;
+  I, N: Integer;
+  Found: Boolean;
+begin
+  Path := ExpandConstant('{app}\config.toml');
+  if not LoadStringsFromFile(Path, Lines) then Exit;
+  if On then Value := 'true ' else Value := 'false';
+  Comment := '             # install new releases from GitHub by itself (only when no game runs and OBS isn''t recording)';
+  Found := False;
+  N := GetArrayLength(Lines);
+  for I := 0 to N - 1 do
+    if (Pos('auto =', TrimLeft(Lines[I])) = 1) or (Pos('auto=', TrimLeft(Lines[I])) = 1) then
+    begin
+      Lines[I] := 'auto = ' + Value + Comment;
+      Found := True;
+    end;
+  if not Found then
+  begin
+    SetArrayLength(Lines, N + 4);
+    Lines[N] := '';
+    Lines[N + 1] := '[update]';
+    Lines[N + 2] := 'auto = ' + Value + Comment;
+    Lines[N + 3] := 'check_hours = 6          # how often to look for a new release; with auto = false it''s only written to the log';
+  end;
+  SaveStringsToUTF8FileWithoutBOM(Path, Lines, False);
+end;
 
 function PowerShell: String;
 begin
@@ -234,7 +276,9 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep <> ssPostInstall then Exit;
-  OfferWatcherRemoval;
+  SaveStringToFile(ExpandConstant('{app}\version.txt'), '{#AppVersion}', False);
+  SetAutoUpdate(WizardIsTaskSelected('autoupdate'));
+  if not IsUpdate then OfferWatcherRemoval;
   SetUpUltron;
-  if WizardIsTaskSelected('obs') then SetUpObs;
+  if WizardIsTaskSelected('obs') and not IsUpdate then SetUpObs;
 end;

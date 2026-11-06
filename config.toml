@@ -22,6 +22,10 @@ url = "ws://localhost:4455"
 # The password is read from the OBS_WEBSOCKET_PASSWORD environment variable
 # (the installer's "Set up OBS" step saves it).
 
+[update]
+auto = true              # install new releases from GitHub by itself (only when no game runs and OBS isn't recording)
+check_hours = 6          # how often to look for a new release; with auto = false it's only written to the log
+
 [voice]
 game_only = ["clip", "start_recording"]  # refused when no game runs; stop/pause/resume always work
 

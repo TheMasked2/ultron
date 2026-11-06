@@ -56,6 +56,11 @@ replay buffer. Say **"Ultron, clip that"** and the moment is saved.
 
 Track 1 is always the full mix, so clips sound right in any player.
 
+**Updates.** With **Keep Ultron up to date** on (the default), Ultron checks this
+repo's releases every 6 hours and installs a new one by itself, but only while no
+game runs and OBS isn't recording. Then it restarts. Turn it off with `auto = false`
+under `[update]`, and new versions are only mentioned in the log.
+
 The Start menu has the settings (`config.toml`), the log, **Restart Ultron** (after
 editing the settings), **Repair** (download the models again) and **Set up OBS again**.
 Uninstall from Settings → Apps; your `config.toml` is kept.
@@ -96,6 +101,8 @@ under `[wake]`; if it misses you, lower it.
    - **Game Window** (Window Capture, underneath): shows games Game Capture can't
      hook, such as Clickteam games like Five Nights at Freddy's
    - **Game Audio** (Application Audio Capture): the game's sound on its own track
+   With several games open, it follows the one whose window is in front; while
+   you're on the desktop or Discord it keeps the last game you played.
 3. It runs the replay buffer only while a game is running.
 4. Optionally it switches scenes when a game starts and stops.
 
@@ -117,6 +124,7 @@ Settings live in `config.toml` in the install folder. Restart Ultron after editi
 | `[audio]` | Microphone, tone loudness, when listening stops |
 | `[stt]` | Speech model and CPU threads |
 | `[obs]` | OBS WebSocket address (password: the `OBS_WEBSOCKET_PASSWORD` user environment variable) |
+| `[update]` | Automatic updates on or off, how often to check |
 | `[voice]` | Commands that only work while a game runs |
 | `[phrases]` | What you can say |
 | `[watcher]` | Source names, poll interval, replay buffer, scene switching |

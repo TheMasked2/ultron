@@ -32,6 +32,19 @@ _k32.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
 _k32.QueryFullProcessImageNameW.argtypes = [wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR, ctypes.POINTER(wintypes.DWORD)]
 _k32.CloseHandle.argtypes = [wintypes.HANDLE]
 _INVALID = wintypes.HANDLE(-1).value
+_u32 = ctypes.WinDLL("user32")
+_u32.GetForegroundWindow.restype = wintypes.HWND
+_u32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+
+
+def foreground_pid() -> int:
+    """Process that owns the window in front (the one you're playing), 0 if none."""
+    hwnd = _u32.GetForegroundWindow()
+    if not hwnd:
+        return 0
+    pid = wintypes.DWORD()
+    _u32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    return pid.value
 
 
 def processes() -> list[tuple[int, str]]:
@@ -71,6 +84,7 @@ class Games:
         self.by_exe: dict[str, list[tuple[str, str]]] = {}  # exe -> [(game name, path suffix)]
         self.loaded_at = 0.0
         self._paths: dict[int, str] = {}
+        self.foreground = ""  # exe of the detected game whose window is in front, "" if none
 
     def load(self):
         data = None
@@ -111,6 +125,8 @@ class Games:
         if time.time() - self.loaded_at > DAY:
             self.load()
         procs = processes()
+        fg = foreground_pid()
+        fg_exe = next((exe for pid, exe in procs if pid == fg), "")
         alive = {pid for pid, _ in procs}
         for pid in [p for p in self._paths if p not in alive]:
             del self._paths[pid]
@@ -130,4 +146,5 @@ class Games:
             if match:
                 found.append((match[0], exe))
                 seen.add(exe)
+        self.foreground = fg_exe if fg_exe in seen else ""
         return found

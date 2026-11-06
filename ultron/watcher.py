@@ -38,12 +38,15 @@ class Watcher(threading.Thread):
 
     def tick(self):
         found = self.games.detect()
+        # Several games open: follow the one in front. When none is in front (desktop,
+        # Discord, alt-tabbed), keep the last one you played.
+        active = next((g for g in found if g[1] == self.games.foreground), None)
         still = self.game and next((g for g in found if g[1] == self.game[1]), None)
-        game = still or (found[0] if found else None)
-        if game and game != self.game:
-            log.info("Detected %s (%s)", *game)
-        elif not game and self.game:
+        game = active or still or (found[0] if found else None)
+        if self.game and not still:
             log.info("%s closed", self.game[0])
+        if game and game != self.game:
+            log.info("Switched to %s (%s): its window is in front" if still else "Detected %s (%s)", *game)
         self.game = game
 
         try:

@@ -10,6 +10,7 @@ from . import commands
 from .config import ROOT, load
 from .games import Games
 from .obs import Obs
+from . import updater
 from .voice import TextIO
 from .watcher import Watcher
 
@@ -67,6 +68,7 @@ def main():
     ap.add_argument("--text", action="store_true", help="type commands instead of speaking; the game watcher stays off")
     ap.add_argument("--game", action="store_true", help="with --text: act as if a game is running")
     ap.add_argument("--no-voice", action="store_true", help="only the game watcher, no microphone")
+    ap.add_argument("--check-update", action="store_true", help="say whether a newer release exists and exit")
     args = ap.parse_args()
 
     handler = logging.handlers.RotatingFileHandler(ROOT / "ultron.log", maxBytes=1_000_000, backupCount=1, encoding="utf-8")
@@ -82,13 +84,22 @@ def main():
         print("\n".join(f"Detected: {n} ({e})" for n, e in found) if found else "No games running")
         return
 
+    if args.check_update:
+        mine = updater.installed()
+        new = updater.latest()[0]
+        print(f"Installed: {mine or 'not installed (no version.txt)'}, latest release: {new}")
+        return
+
     obs = Obs(cfg["obs"]["url"])
     watcher = None
     if not args.text:
         ensure_single_instance()
         watcher = Watcher(cfg["watcher"], obs, games)
         watcher.start()
-        log.info("Ultron started (pid %d, %d game executables)", os.getpid(), len(games.by_exe))
+        log.info("Ultron %s started (pid %d, %d game executables)",
+                 updater.installed() or "(dev)", os.getpid(), len(games.by_exe))
+        if updater.installed():
+            updater.Updater(cfg.get("update", {}), obs, watcher).start()
     if args.no_voice:
         while True:
             time.sleep(3600)

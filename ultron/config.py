@@ -5,5 +5,5 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def load(path: Path = ROOT / "config.toml") -> dict:
-    with open(path, "rb") as f:
-        return tomllib.load(f)
+    # utf-8-sig: the installer may save the file with a byte order mark.
+    return tomllib.loads(path.read_text(encoding="utf-8-sig"))
