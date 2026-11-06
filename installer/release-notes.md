@@ -1,3 +1,10 @@
+## New in 1.0.11
+
+- **Automatic updates.** Ultron checks for new releases every 6 hours and updates itself, only while no game runs and OBS isn't recording. It's the "Keep Ultron up to date" checkbox in the installer, or `auto` under `[update]` in `config.toml`. From this version on you won't need to download new installers.
+- **Several games open:** OBS now records the game whose window is in front. Before, it stayed on the first game it found (paused in Aimlabs, switched to VALORANT, still recording Aimlabs).
+
+Coming from 1.0.8 or older: install this one by hand once.
+
 ## New in 1.0.8
 
 - Fixed: Ultron could fail to connect when OBS had a different WebSocket password than the one Ultron had picked up. It now reads the saved password every time it connects.
