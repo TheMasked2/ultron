@@ -16,7 +16,6 @@
 #
 # Exit codes (the installers use them): 0 done, 2 OBS not installed,
 # 3 OBS never opened yet, 4 OBS must be closed first, 5 couldn't talk to OBS.
-# The same script ships with Jarvis and OBS Game Watcher; keep the copies identical.
 param(
     [int]$ReplaySeconds = 120,
     [switch]$ForceLength,           # also change the length if the replay buffer is already on

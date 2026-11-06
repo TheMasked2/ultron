@@ -37,15 +37,12 @@ def skip_unused_imports():
 
 
 def wake_model(cfg: dict) -> str:
-    """A trained model in models/wake/<name>.onnx, else a built-in openWakeWord one."""
-    name = cfg["wake"]["model"]
-    path = ROOT / "models" / "wake" / f"{name}.onnx"
-    if path.is_file():
-        return str(path)
-    fallback = cfg["wake"].get("fallback", "hey_jarvis")
-    if name != fallback:
-        log.warning("wake word model %s not found, using %s", path, fallback)
-    return fallback
+    """The wake word model, models/wake/<name>.onnx. No built-in stand-in: those answer to
+    other words, which Ultron shouldn't react to."""
+    path = ROOT / "models" / "wake" / f"{cfg['wake']['model']}.onnx"
+    if not path.is_file():
+        raise FileNotFoundError(f"wake word model {path} is missing: run Repair or reinstall Ultron")
+    return str(path)
 
 
 class VoiceIO(TextIO):

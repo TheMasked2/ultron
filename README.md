@@ -120,7 +120,7 @@ Settings live in `config.toml` in the install folder. Restart Ultron after editi
 
 | Section | What |
 |---|---|
-| `[wake]` | Wake word model, fallback and sensitivity |
+| `[wake]` | Wake word model and sensitivity |
 | `[audio]` | Microphone, tone loudness, when listening stops |
 | `[stt]` | Speech model and CPU threads |
 | `[obs]` | OBS WebSocket address (password: the `OBS_WEBSOCKET_PASSWORD` user environment variable) |

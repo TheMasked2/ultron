@@ -59,8 +59,10 @@ Remove-Item -Recurse -Force "$PSScriptRoot\.venv-old" -ErrorAction SilentlyConti
 "Downloading the wake word and speech models..."
 & $uv run --project $PSScriptRoot python -c @"
 import openwakeword.utils, tomllib
-cfg = tomllib.load(open(r'$PSScriptRoot\config.toml', 'rb'))
-openwakeword.utils.download_models([cfg['wake']['fallback']])
+cfg = tomllib.loads(open(r'$PSScriptRoot\config.toml', encoding='utf-8-sig').read())
+# Ultron's own wake word ships with it. No built-in model has this name, so this only
+# fetches the helper models every wake word needs (an empty list would fetch them all).
+openwakeword.utils.download_models([cfg['wake']['model']])
 from faster_whisper import WhisperModel
 WhisperModel(cfg['stt']['model'], device='cpu', compute_type='int8')
 print('Models ready.')

@@ -1,5 +1,4 @@
-{ OBS scene and audio track pages for the "Set up OBS" step. Shared by the Jarvis and
-  OBS Game Watcher installers: keep the copies identical. Needs obs-setup.ps1 in [Files]
+{ OBS scene and audio track pages for the "Set up OBS" step. Needs obs-setup.ps1 in [Files]
   (it's run early, from the temp folder, to list the existing scenes).
   Build with /DUiTest to get an installer that shows the pages but never installs. }
 var

@@ -186,10 +186,16 @@ class Updater(threading.Thread):
         return (lock.read_bytes() if lock.exists() else b"") != old_lock
 
     def add_settings(self, root: Path | None = None):
-        """Updates never replace config.toml; show the [update] settings in older ones."""
+        """Updates never replace config.toml: show the [update] settings in older ones, and
+        drop the built-in stand-in wake word setting older versions had (no longer used)."""
         cfg = (root or ROOT) / "config.toml"
         try:
             text = cfg.read_text(encoding="utf-8-sig")
+            old = text
+            text = "".join(l for l in text.splitlines(keepends=True) if not l.lstrip().startswith("fallback ="))
+            text = text.replace("; until it's there, the fallback is used", "")
+            if text != old:
+                cfg.write_text(text, encoding="utf-8")
             if "[update]" not in text:
                 cfg.write_text(text.rstrip("\n") + "\n\n[update]\n"
                                "auto = true              # update from GitHub releases by itself (only when no game runs and OBS isn't recording)\n"

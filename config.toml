@@ -1,8 +1,7 @@
 # Ultron settings. Restart Ultron after editing (Start menu: Restart Ultron).
 
 [wake]
-model = "ultron"         # models/wake/ultron.onnx; until it's there, the fallback is used
-fallback = "hey_jarvis"  # built-in openWakeWord model
+model = "ultron"         # models/wake/ultron.onnx
 threshold = 0.7          # 0-1, raise it if Ultron wakes up by accident
 
 [audio]

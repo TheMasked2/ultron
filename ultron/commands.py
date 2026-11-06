@@ -44,7 +44,7 @@ ACTIONS = {
     "resume_recording": lambda obs: pause(obs, False),
 }
 
-_FILLER_START = re.compile(r"^((hey|hi|ok|okay|yo) )?(ultron |jarvis )?(please )?")
+_FILLER_START = re.compile(r"^((hey|hi|ok|okay|yo) )?(ultron )?(please )?")
 _FILLER_END = re.compile(r" (please|ultron|thanks|thank you)$")
 
 
